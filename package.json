@@ -1,6 +1,6 @@
 {
   "name": "@f0rr0/thrift-compact-protocol",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Marshalling/unmarshalling between Facebook Thrift Compact Protocol and Javascript with type definitions.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
