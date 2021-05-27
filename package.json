@@ -1,0 +1,32 @@
+{
+  "name": "@f0rr0/thrift-compact-protocol",
+  "version": "0.0.1",
+  "description": "Marshalling/unmarshalling between Facebook Thrift Compact Protocol and Javascript with type definitions.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "url": "https://github.com/f0rr0/thrift-compact-protocol.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc -p .",
+    "format": "prettier --write ."
+  },
+  "author": "Sid Jain",
+  "license": "MIT",
+  "devDependencies": {
+    "@tsconfig/node14": "^1.0.0",
+    "@types/node": "^15.6.1",
+    "prettier": "^2.3.0",
+    "typescript": "^4.3.2"
+  }
+}
