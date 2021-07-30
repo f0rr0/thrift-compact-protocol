@@ -2,7 +2,6 @@ import { ThriftType, isThriftBoolean, thriftTypeName, t } from './types'
 import { ThriftError } from './errors'
 
 export class BufferReader {
-  // BufferReader implements decoding the Thrift Compact protocol into JavaScript values.
   // https://github.com/apache/thrift/blob/master/doc/specs/thrift-compact-protocol.md
 
   private _buffer: Buffer
@@ -103,13 +102,6 @@ export class BufferReader {
     return [byte & 0x0f, this._prev_field_id]
   }
 
-  // type == TType.DOUBLE:
-  //     # Doubles are encoded as little endian
-  //     # https://github.com/apache/thrift/blob/master/doc/specs/thrift-compact-protocol.md#double-encoding
-  //     return struct.unpack("<d", self.read(8))
-  // type == TType.FLOAT:
-  //     # This seems to be a facebook-specific 32-bit float
-  //     return struct.unpack("<d", self.read(4))
   private read_val(type: ThriftType) {
     switch (type) {
       case ThriftType.TRUE:

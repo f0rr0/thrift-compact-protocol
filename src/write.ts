@@ -59,7 +59,6 @@ export class BufferWriter {
         this._write_byte(num)
         break
       } else if (byte === -128) {
-        // -128 = 0b1000_0000 but it's the last an no other bytes will follow
         this._write_byte(0)
         break
       } else {
