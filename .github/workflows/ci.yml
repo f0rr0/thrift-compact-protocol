@@ -1,0 +1,75 @@
+name: CI and release
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    name: Check (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["22", "24"]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: jdx/mise-action@v4
+      - run: bun ci
+      - run: hk check --all
+      - run: bun run build
+      - name: Test the published package surface on Node
+        shell: bash
+        run: |
+          package_dir="$(mktemp -d)"
+          npm pack --ignore-scripts --pack-destination "$package_dir"
+          npm install --prefix "$package_dir" --ignore-scripts --no-package-lock "$package_dir"/*.tgz
+          cd "$package_dir"
+          node --input-type=module <<'JS'
+          import assert from "node:assert/strict";
+          import { t } from "@f0rr0/thrift-compact-protocol";
+          const schema = t.struct({ value: t.double.field(1) });
+          const bytes = Uint8Array.of(0x17, 0x3f, 0xf0, 0, 0, 0, 0, 0, 0, 0);
+          assert.deepEqual(schema.encode({ value: 1 }), bytes);
+          assert.deepEqual(schema.decode(bytes), { value: 1 });
+          assert.deepEqual(await schema["~standard"].validate(bytes), { value: { value: 1 } });
+          JS
+
+  release:
+    name: Release
+    needs: check
+    if: github.repository == 'f0rr0/thrift-compact-protocol' && github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - uses: jdx/mise-action@v4
+      - run: bun ci
+      - run: bun run build
+      - run: bun run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

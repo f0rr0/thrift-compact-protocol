@@ -1,32 +1,83 @@
 {
   "name": "@f0rr0/thrift-compact-protocol",
-  "version": "0.0.2",
-  "description": "Marshalling/unmarshalling between Facebook Thrift Compact Protocol and Javascript with type definitions.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "1.0.0",
+  "description": "A tiny, type-safe Facebook Thrift Compact Protocol codec.",
+  "keywords": [
+    "compact-protocol",
+    "serialization",
+    "thrift",
+    "typescript"
+  ],
+  "homepage": "https://github.com/f0rr0/thrift-compact-protocol#readme",
+  "bugs": {
+    "url": "https://github.com/f0rr0/thrift-compact-protocol/issues"
+  },
+  "license": "MIT",
+  "author": "Sid Jain",
   "repository": {
-    "url": "https://github.com/f0rr0/thrift-compact-protocol.git"
+    "type": "git",
+    "url": "git+https://github.com/f0rr0/thrift-compact-protocol.git"
   },
   "files": [
     "dist"
   ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
-  "engines": {
-    "node": ">=14.0.0"
-  },
   "scripts": {
-    "prepare": "npm run build",
-    "build": "tsc -p .",
-    "format": "prettier --write ."
+    "build": "tsc -p tsconfig.build.json",
+    "check": "hk check --all",
+    "fix": "hk fix --all",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint --type-aware --deny-warnings .",
+    "release": "semantic-release",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run check && bun run build"
   },
-  "author": "Sid Jain",
-  "license": "MIT",
+  "dependencies": {
+    "@standard-schema/spec": "1.1.0"
+  },
   "devDependencies": {
-    "@tsconfig/node14": "^1.0.0",
-    "@types/node": "^15.6.1",
-    "prettier": "^2.3.0",
-    "typescript": "^4.3.2"
-  }
+    "@types/bun": "1.4.1",
+    "oxfmt": "0.66.0",
+    "oxlint": "1.81.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "semantic-release": "25.0.9",
+    "typescript": "7.0.2",
+    "ultracite": "7.11.0"
+  },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/github",
+        {
+          "successComment": false,
+          "failComment": false,
+          "failTitle": false,
+          "releasedLabels": false
+        }
+      ]
+    ]
+  },
+  "engines": {
+    "bun": ">=1.3.0",
+    "node": ">=22.0.0"
+  },
+  "packageManager": "bun@1.4.2"
 }

@@ -1,0 +1,37 @@
+amends "package://github.com/jdx/hk/releases/download/v1.58.1/hk@1.58.1#/Config.pkl"
+
+local checks = new Mapping<String, Step> {
+  ["format"] {
+    glob = List("**/*.json", "**/*.md", "**/*.ts")
+    check = "bun x oxfmt --check {{files}}"
+    fix = "bun x oxfmt --write {{files}}"
+  }
+  ["lint"] {
+    glob = "**/*.ts"
+    check = "bun x oxlint --type-aware --deny-warnings {{files}}"
+    depends = "format"
+  }
+  ["typecheck"] {
+    glob = "**/*.ts"
+    check = "bun run typecheck"
+    depends = "format"
+  }
+  ["test"] {
+    glob = "src/**/*.ts"
+    check = "bun test"
+    depends = List("lint", "typecheck")
+  }
+}
+
+hooks {
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps = checks
+  }
+  ["check"] { steps = checks }
+  ["fix"] {
+    fix = true
+    steps = checks
+  }
+}
